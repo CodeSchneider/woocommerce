@@ -28,7 +28,10 @@ if ( $total <= 1 ) {
 	return;
 }
 ?>
-<nav class="woocommerce-pagination">
+<nav class="pagination is-centered" role="navigation" aria-label="pagination">
+  <?php echo bulma_pagination(); ?>
+</nav>
+<!-- <nav class="woocommerce-pagination pagination is-centered">
 	<?php
 		echo paginate_links( apply_filters( 'woocommerce_pagination_args', array( // WPCS: XSS ok.
 			'base'         => $base,
@@ -43,4 +46,4 @@ if ( $total <= 1 ) {
 			'mid_size'     => 3,
 		) ) );
 	?>
-</nav>
+</nav> -->

@@ -1058,8 +1058,14 @@ function wc_get_product_category_list( $product_id, $sep = ', ', $before = '', $
  * @param string $after (default: '').
  * @return string
  */
-function wc_get_product_tag_list( $product_id, $sep = ', ', $before = '', $after = '' ) {
+function wc_get_product_tag_list( $product_id, $sep = '', $before = '', $after = '' ) {
 	return get_the_term_list( $product_id, 'product_tag', $before, $sep, $after );
+}
+
+add_filter( "term_links-product_tag", 'add_tag_class');
+
+function add_tag_class($links) {
+    return str_replace('</a>', '</span></a>', str_replace('rel="tag">', 'rel="tag"><span class="tag">', $links));
 }
 
 /**

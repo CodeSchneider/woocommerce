@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
-<table class="shop_attributes">
+<table class="table shop_attributes">
 	<?php if ( $display_dimensions && $product->has_weight() ) : ?>
 		<tr>
 			<th><?php _e( 'Weight', 'woocommerce' ) ?></th>
@@ -51,7 +51,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						$value_name = esc_html( $attribute_value->name );
 
 						if ( $attribute_taxonomy->attribute_public ) {
-							$values[] = '<a href="' . esc_url( get_term_link( $attribute_value->term_id, $attribute->get_name() ) ) . '" rel="tag">' . $value_name . '</a>';
+							$values[] = '<a href="' . esc_url( get_term_link( $attribute_value->term_id, $attribute->get_name() ) ) . '" rel="taggg">' . $value_name . '</a>';
 						} else {
 							$values[] = $value_name;
 						}

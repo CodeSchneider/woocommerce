@@ -31,10 +31,10 @@ jQuery( function( $ ) {
 			var $tabs_wrapper = $tab.closest( '.wc-tabs-wrapper, .woocommerce-tabs' );
 			var $tabs         = $tabs_wrapper.find( '.wc-tabs, ul.tabs' );
 
-			$tabs.find( 'li' ).removeClass( 'active' );
+			$tabs.find( 'li' ).removeClass( 'is-active' );
 			$tabs_wrapper.find( '.wc-tab, .panel:not(.panel .panel)' ).hide();
 
-			$tab.closest( 'li' ).addClass( 'active' );
+			$tab.closest( 'li' ).addClass( 'is-active' );
 			$tabs_wrapper.find( $tab.attr( 'href' ) ).show();
 		} )
 		// Review link
@@ -300,4 +300,28 @@ jQuery( function( $ ) {
 	$( '.woocommerce-product-gallery' ).each( function() {
 		$( this ).wc_product_gallery();
 	} );
+
+	//slick slider
+	// $(document).ready(function(){
+	// 	$('.woocommerce-product-gallery__wrapper').slick({
+	// 		autoplay: false,
+	// 		slidesToShow: 1,
+	// 		// slidesToShow: 3,
+  //     // slidesToScroll: 1,
+	// 		arrows: false,
+	// 		fade: true,
+	// 		// centerMode: true,
+	// 		asNavFor: '.woocommerce-product-gallery-nav__wrapper'
+	// 	});
+	// 	$('.woocommerce-product-gallery-nav__wrapper').slick({
+	// 		slidesToShow: 3,
+	// 		slidesToScroll: 1,
+	// 		asNavFor: '.woocommerce-product-gallery__wrapper',
+	// 		dots: false,
+	// 		centerMode: false,
+	// 		arrows: false,
+	// 		// centerPadding: '50px',
+	// 		focusOnSelect: true
+	// 	});
+	// });
 } );

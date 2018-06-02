@@ -625,6 +625,9 @@ function wc_get_product_class( $class = '', $product_id = null ) {
 	// Hentry for hAtom compliance.
 	$classes[] = 'hentry';
 
+	// Bulma.io columns container
+	// $classes[] = 'columns'; //TODO figure out where we should add this class, it messes up product gallery...
+
 	// Include attributes and any extra taxonomy.
 	if ( apply_filters( 'woocommerce_get_product_class_include_taxonomies', false ) ) {
 		$taxonomies = get_taxonomies( array( 'public' => true ) );
@@ -652,6 +655,117 @@ function wc_get_product_class( $class = '', $product_id = null ) {
  */
 function wc_product_class( $class = '', $product_id = null ) {
 	echo 'class="' . esc_attr( join( ' ', wc_get_product_class( $class, $product_id ) ) ) . '"';
+}
+
+/**
+ * Retrieves the classes for the post div as an array with bulma columns class.
+ *
+ * This method is clone from WordPress's get_post_class(), allowing removing taxonomies.
+ *
+ * @since 3.4.0
+ * @param string|array           $class      One or more classes to add to the class list.
+ * @param int|WP_Post|WC_Product $product_id Product ID or product object.
+ * @return array
+ */
+function wc_get_product_class_with_bulma_class( $class = '', $product_id = null ) {
+	if ( is_a( $product_id, 'WC_Product' ) ) {
+		$product    = $product_id;
+		$product_id = $product_id->get_id();
+		$post       = get_post( $product_id );
+	} else {
+		$post    = get_post( $product_id );
+		$product = wc_get_product( $post->ID );
+	}
+
+	$classes = array();
+
+	if ( $class ) {
+		if ( ! is_array( $class ) ) {
+			$class = preg_split( '#\s+#', $class );
+		}
+		$classes = array_map( 'esc_attr', $class );
+	} else {
+		// Ensure that we always coerce class to being an array.
+		$class = array();
+	}
+
+	if ( ! $post || ! $product ) {
+		return $classes;
+	}
+
+	$classes[] = 'post-' . $post->ID;
+	if ( ! is_admin() ) {
+		$classes[] = $post->post_type;
+	}
+	$classes[] = 'type-' . $post->post_type;
+	$classes[] = 'status-' . $post->post_status;
+
+	// Post format.
+	if ( post_type_supports( $post->post_type, 'post-formats' ) ) {
+		$post_format = get_post_format( $post->ID );
+
+		if ( $post_format && ! is_wp_error( $post_format ) ) {
+			$classes[] = 'format-' . sanitize_html_class( $post_format );
+		} else {
+			$classes[] = 'format-standard';
+		}
+	}
+
+	// Post requires password.
+	$post_password_required = post_password_required( $post->ID );
+	if ( $post_password_required ) {
+		$classes[] = 'post-password-required';
+	} elseif ( ! empty( $post->post_password ) ) {
+		$classes[] = 'post-password-protected';
+	}
+
+	// Post thumbnails.
+	if ( current_theme_supports( 'post-thumbnails' ) && has_post_thumbnail( $post->ID ) && ! is_attachment( $post ) && ! $post_password_required ) {
+		$classes[] = 'has-post-thumbnail';
+	}
+
+	// Sticky for Sticky Posts.
+	if ( is_sticky( $post->ID ) ) {
+		if ( is_home() && ! is_paged() ) {
+			$classes[] = 'sticky';
+		} elseif ( is_admin() ) {
+			$classes[] = 'status-sticky';
+		}
+	}
+
+	// Hentry for hAtom compliance.
+	$classes[] = 'hentry';
+
+	// Bulma.io columns container
+	$classes[] = 'columns';
+
+	// Include attributes and any extra taxonomy.
+	if ( apply_filters( 'woocommerce_get_product_class_include_taxonomies', false ) ) {
+		$taxonomies = get_taxonomies( array( 'public' => true ) );
+		foreach ( (array) $taxonomies as $taxonomy ) {
+			if ( is_object_in_taxonomy( $post->post_type, $taxonomy ) && in_array( $taxonomy, array( 'product_cat', 'product_tag' ), true ) ) {
+				$classes = array_merge( $classes, wc_get_product_taxonomy_class( (array) get_the_terms( $post->ID, $taxonomy ), $taxonomy ) );
+			}
+		}
+	}
+	// Categories.
+	$classes = array_merge( $classes, wc_get_product_taxonomy_class( $product->get_category_ids(), 'product_cat' ) );
+
+	// Tags.
+	$classes = array_merge( $classes, wc_get_product_taxonomy_class( $product->get_tag_ids(), 'product_tag' ) );
+
+	return array_filter( array_unique( apply_filters( 'post_class', $classes, $class, $post->ID ) ) );
+}
+
+/**
+ * Display the classes for the product div with bulma columns class.
+ *
+ * @since 3.4.0
+ * @param string|array           $class      One or more classes to add to the class list.
+ * @param int|WP_Post|WC_Product $product_id Product ID or product object.
+ */
+function wc_product_class_with_bulma_columns( $class = '', $product_id = null ) {
+	echo 'class="' . esc_attr( join( ' ', wc_get_product_class_with_bulma_class( $class, $product_id ) ) ) . '"';
 }
 
 /**
@@ -1060,6 +1174,14 @@ if ( ! function_exists( 'woocommerce_template_loop_product_title' ) ) {
 		echo '<h2 class="woocommerce-loop-product__title">' . get_the_title() . '</h2>';
 	}
 }
+if ( ! function_exists( 'woocommerce_template_loop_product_title_overlay' ) ) {
+	/**
+	 * Show the product title in the product loop in the form of an overlay.
+	 */
+	function woocommerce_template_loop_product_title_overlay() {
+		echo '<div class="woocommerce-loop-product__title-overlay">' . get_the_title() . '</div>';
+	}
+}
 if ( ! function_exists( 'woocommerce_template_loop_category_title' ) ) {
 
 	/**
@@ -1247,7 +1369,7 @@ if ( ! function_exists( 'woocommerce_get_product_thumbnail' ) ) {
 	 * @param int    $deprecated2 Deprecated since WooCommerce 2.0 (default: 0).
 	 * @return string
 	 */
-	function woocommerce_get_product_thumbnail( $size = 'woocommerce_thumbnail', $deprecated1 = 0, $deprecated2 = 0 ) {
+	function woocommerce_get_product_thumbnail( $size = 'woocommerce_single', $deprecated1 = 0, $deprecated2 = 0 ) { //TODO change image to something smaller than woocommerce-single?
 		global $product;
 
 		$image_size = apply_filters( 'single_product_archive_thumbnail_size', $size );
@@ -2030,9 +2152,9 @@ if ( ! function_exists( 'woocommerce_breadcrumb' ) ) {
 	 */
 	function woocommerce_breadcrumb( $args = array() ) {
 		$args = wp_parse_args( $args, apply_filters( 'woocommerce_breadcrumb_defaults', array(
-			'delimiter'   => '&nbsp;&#47;&nbsp;',
-			'wrap_before' => '<nav class="woocommerce-breadcrumb">',
-			'wrap_after'  => '</nav>',
+			'delimiter'   => '',
+			'wrap_before' => '<nav class="woocommerce-breadcrumb breadcrumb" aria-label="breadcrumbs"><ul>',
+			'wrap_after'  => '</ul></nav>',
 			'before'      => '',
 			'after'       => '',
 			'home'        => _x( 'Home', 'breadcrumb', 'woocommerce' ),
@@ -2561,7 +2683,7 @@ if ( ! function_exists( 'woocommerce_form_field' ) ) {
 
 				break;
 			case 'textarea':
-				$field .= '<textarea name="' . esc_attr( $key ) . '" class="input-text ' . esc_attr( implode( ' ', $args['input_class'] ) ) . '" id="' . esc_attr( $args['id'] ) . '" placeholder="' . esc_attr( $args['placeholder'] ) . '" ' . ( empty( $args['custom_attributes']['rows'] ) ? ' rows="2"' : '' ) . ( empty( $args['custom_attributes']['cols'] ) ? ' cols="5"' : '' ) . implode( ' ', $custom_attributes ) . '>' . esc_textarea( $value ) . '</textarea>';
+				$field .= '<textarea name="' . esc_attr( $key ) . '" class="input-text textarea' . esc_attr( implode( ' ', $args['input_class'] ) ) . '" id="' . esc_attr( $args['id'] ) . '" placeholder="' . esc_attr( $args['placeholder'] ) . '" ' . ( empty( $args['custom_attributes']['rows'] ) ? ' rows="2"' : '' ) . ( empty( $args['custom_attributes']['cols'] ) ? ' cols="5"' : '' ) . implode( ' ', $custom_attributes ) . '>' . esc_textarea( $value ) . '</textarea>';
 
 				break;
 			case 'checkbox':
@@ -2581,7 +2703,7 @@ if ( ! function_exists( 'woocommerce_form_field' ) ) {
 			case 'email':
 			case 'url':
 			case 'tel':
-				$field .= '<input type="' . esc_attr( $args['type'] ) . '" class="input-text ' . esc_attr( implode( ' ', $args['input_class'] ) ) . '" name="' . esc_attr( $key ) . '" id="' . esc_attr( $args['id'] ) . '" placeholder="' . esc_attr( $args['placeholder'] ) . '"  value="' . esc_attr( $value ) . '" ' . implode( ' ', $custom_attributes ) . ' />';
+				$field .= '<input type="' . esc_attr( $args['type'] ) . '" class="input-text input' . esc_attr( implode( ' ', $args['input_class'] ) ) . '" name="' . esc_attr( $key ) . '" id="' . esc_attr( $args['id'] ) . '" placeholder="' . esc_attr( $args['placeholder'] ) . '"  value="' . esc_attr( $value ) . '" ' . implode( ' ', $custom_attributes ) . ' />';
 
 				break;
 			case 'select':
@@ -2623,7 +2745,7 @@ if ( ! function_exists( 'woocommerce_form_field' ) ) {
 			$field_html = '';
 
 			if ( $args['label'] && 'checkbox' !== $args['type'] ) {
-				$field_html .= '<label for="' . esc_attr( $label_id ) . '" class="' . esc_attr( implode( ' ', $args['label_class'] ) ) . '">' . $args['label'] . $required . '</label>';
+				$field_html .= '<label for="' . esc_attr( $label_id ) . '" class="label' . esc_attr( implode( ' ', $args['label_class'] ) ) . '">' . $args['label'] . $required . '</label>';
 			}
 
 			$field_html .= '<span class="woocommerce-input-wrapper">' . $field;

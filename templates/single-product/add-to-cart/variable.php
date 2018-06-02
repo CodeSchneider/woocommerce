@@ -27,31 +27,31 @@ do_action( 'woocommerce_before_add_to_cart_form' ); ?>
 	<?php do_action( 'woocommerce_before_variations_form' ); ?>
 
 	<?php if ( empty( $available_variations ) && false !== $available_variations ) : ?>
-		<p class="stock out-of-stock"><?php esc_html_e( 'This product is currently out of stock and unavailable.', 'woocommerce' ); ?></p>
+		<p class="stock out-of-stock notification is-danger"><?php esc_html_e( 'This product is currently out of stock and unavailable.', 'woocommerce' ); ?></p>
 	<?php else : ?>
-		<table class="variations" cellspacing="0">
-			<tbody>
+		<div class="variations" cellspacing="0">
 				<?php foreach ( $attributes as $attribute_name => $options ) : ?>
-					<tr>
-						<td class="label"><label for="<?php echo esc_attr( sanitize_title( $attribute_name ) ); ?>"><?php echo esc_html( wc_attribute_label( $attribute_name ) ); ?></label></td>
-						<td class="value">
-							<?php
-								$selected = isset( $_REQUEST[ 'attribute_' . $attribute_name ] ) ? wc_clean( urldecode( wp_unslash( $_REQUEST[ 'attribute_' . $attribute_name ] ) ) ) : $product->get_variation_default_attribute( $attribute_name ); // WPCS: input var ok, CSRF ok, sanitization ok.
+							<div class="field">
+							  <label class="label" for="<?php echo esc_attr( sanitize_title( $attribute_name ) ); ?>"><?php echo esc_html( wc_attribute_label( $attribute_name ) ); ?></label>
+							  <div class="control">
+							    <div class="select">
+										<?php
+											$selected = isset( $_REQUEST[ 'attribute_' . $attribute_name ] ) ? wc_clean( urldecode( wp_unslash( $_REQUEST[ 'attribute_' . $attribute_name ] ) ) ) : $product->get_variation_default_attribute( $attribute_name ); // WPCS: input var ok, CSRF ok, sanitization ok.
 
-								wc_dropdown_variation_attribute_options( array(
-									'options'   => $options,
-									'attribute' => $attribute_name,
-									'product'   => $product,
-									'selected'  => $selected,
-								) );
+											wc_dropdown_variation_attribute_options( array(
+												'options'   => $options,
+												'attribute' => $attribute_name,
+												'product'   => $product,
+												'selected'  => $selected,
+											) );
 
-								echo end( $attribute_keys ) === $attribute_name ? wp_kses_post( apply_filters( 'woocommerce_reset_variations_link', '<a class="reset_variations" href="#">' . esc_html__( 'Clear', 'woocommerce' ) . '</a>' ) ) : '';
-							?>
-						</td>
-					</tr>
+										?>
+							    </div>
+							  </div>
+							</div>
+					<?php echo end( $attribute_keys ) === $attribute_name ? wp_kses_post( apply_filters( 'woocommerce_reset_variations_link', '<a class="reset_variations button is-small is-info is-outlined" href="#">' . esc_html__( 'Clear', 'woocommerce' ) . '</a>' ) ) : ''; ?>
 				<?php endforeach; ?>
-			</tbody>
-		</table>
+		</div>
 
 		<div class="single_variation_wrap">
 			<?php
