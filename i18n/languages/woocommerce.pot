@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce 3.4.0-beta.1\n"
 "Report-Msgid-Bugs-To: https://github.com/woocommerce/woocommerce/issues\n"
-"POT-Creation-Date: 2018-05-01 20:51:21+00:00\n"
+"POT-Creation-Date: 2018-06-19 03:51:44+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -6440,7 +6440,7 @@ msgstr ""
 #: includes/gateways/cod/class-wc-gateway-cod.php:117
 #: includes/gateways/paypal/includes/settings-paypal.php:25
 #: includes/gateways/simplify-commerce/class-wc-gateway-simplify-commerce.php:204
-#: includes/wc-template-functions.php:1645
+#: includes/wc-template-functions.php:1764
 #: templates/single-product/tabs/description.php:25
 msgid "Description"
 msgstr ""
@@ -7701,7 +7701,7 @@ msgstr ""
 #: includes/admin/views/html-notice-template-check.php:13
 #: includes/admin/views/html-notice-theme-support.php:12
 #: includes/admin/views/html-notice-updated.php:12
-#: includes/wc-template-functions.php:963
+#: includes/wc-template-functions.php:1074
 msgid "Dismiss"
 msgstr ""
 
@@ -7927,8 +7927,8 @@ msgid_plural "%s coupons restored from the Trash."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/admin/class-wc-admin-post-types.php:688 templates/cart/cart.php:136
-#: templates/checkout/form-coupon.php:34
+#: includes/admin/class-wc-admin-post-types.php:688 templates/cart/cart.php:140
+#: templates/checkout/form-coupon.php:35
 msgid "Coupon code"
 msgstr ""
 
@@ -8084,7 +8084,7 @@ msgstr ""
 #: includes/admin/class-wc-admin-profile.php:137
 #: includes/admin/meta-boxes/class-wc-meta-box-order-data.php:76
 #: includes/admin/meta-boxes/class-wc-meta-box-order-data.php:127
-#: includes/wc-template-functions.php:2524
+#: includes/wc-template-functions.php:2643
 #: templates/cart/shipping-calculator.php:36
 msgid "Select a country&hellip;"
 msgstr ""
@@ -9309,7 +9309,7 @@ msgstr ""
 #: includes/class-wc-emails.php:404
 #: includes/legacy/abstract-wc-legacy-order.php:507
 #: includes/wc-account-functions.php:214
-#: includes/wc-template-functions.php:3060
+#: includes/wc-template-functions.php:3179
 msgid "Download"
 msgstr ""
 
@@ -11171,7 +11171,7 @@ msgid "Add item(s)"
 msgstr ""
 
 #: includes/admin/meta-boxes/views/html-order-items.php:229
-#: templates/cart/cart.php:136 templates/checkout/form-coupon.php:38
+#: templates/cart/cart.php:140 templates/checkout/form-coupon.php:39
 msgid "Apply coupon"
 msgstr ""
 
@@ -12451,7 +12451,7 @@ msgstr ""
 
 #: includes/admin/settings/class-wc-settings-accounts.php:51
 #: includes/class-wc-download-handler.php:155 templates/auth/form-login.php:49
-#: templates/global/form-login.php:48 templates/myaccount/form-login.php:36
+#: templates/global/form-login.php:50 templates/myaccount/form-login.php:36
 msgid "Login"
 msgstr ""
 
@@ -12512,7 +12512,7 @@ msgid ""
 msgstr ""
 
 #: includes/admin/settings/class-wc-settings-accounts.php:118
-#: includes/wc-template-functions.php:754
+#: includes/wc-template-functions.php:865
 msgid ""
 "Your personal data will be used to support your experience throughout this "
 "website, to manage access to your account, and for other purposes described "
@@ -12532,7 +12532,7 @@ msgstr ""
 
 #: includes/admin/settings/class-wc-settings-accounts.php:127
 #: includes/customizer/class-wc-shop-customizer.php:760
-#: includes/wc-template-functions.php:751
+#: includes/wc-template-functions.php:862
 msgid ""
 "Your personal data will be used to process your order, support your "
 "experience throughout this website, and for other purposes described in our "
@@ -12676,7 +12676,7 @@ msgstr ""
 #: includes/admin/settings/class-wc-settings-advanced.php:183
 #: includes/class-wc-query.php:130
 #: templates/myaccount/form-add-payment-method.php:52
-#: templates/myaccount/payment-methods.php:80
+#: templates/myaccount/payment-methods.php:81
 msgid "Add payment method"
 msgstr ""
 
@@ -19601,7 +19601,7 @@ msgid ""
 msgstr ""
 
 #: includes/class-wc-cart.php:1067 includes/class-wc-frontend-scripts.php:546
-#: includes/wc-cart-functions.php:123 includes/wc-template-functions.php:1957
+#: includes/wc-cart-functions.php:123 includes/wc-template-functions.php:2076
 #. translators: %s: product name
 msgid "View cart"
 msgstr ""
@@ -19668,7 +19668,7 @@ msgid "Create account password"
 msgstr ""
 
 #: includes/class-wc-checkout.php:238 templates/auth/form-login.php:44
-#: templates/global/form-login.php:39 templates/myaccount/form-login.php:47
+#: templates/global/form-login.php:41 templates/myaccount/form-login.php:47
 #: templates/myaccount/form-login.php:97
 msgid "Password"
 msgstr ""
@@ -20079,7 +20079,7 @@ msgstr ""
 msgid "Buy now"
 msgstr ""
 
-#: includes/class-wc-embed.php:130 includes/wc-template-functions.php:3173
+#: includes/class-wc-embed.php:130 includes/wc-template-functions.php:3292
 #: includes/widgets/class-wc-widget-layered-nav-filters.php:102
 #. translators: %s: average rating
 #. translators: %s: rating
@@ -20252,12 +20252,12 @@ msgid "Error processing checkout. Please try again."
 msgstr ""
 
 #: includes/class-wc-frontend-scripts.php:521
-#: includes/wc-template-functions.php:2462
+#: includes/wc-template-functions.php:2581
 msgid "required"
 msgstr ""
 
 #: includes/class-wc-frontend-scripts.php:522
-#: includes/wc-template-functions.php:2464
+#: includes/wc-template-functions.php:2583
 msgid "optional"
 msgstr ""
 
@@ -20272,7 +20272,7 @@ msgid "Please select some product options before adding this product to your car
 msgstr ""
 
 #: includes/class-wc-frontend-scripts.php:560
-#: templates/single-product/add-to-cart/variation.php:23
+#: templates/single-product/add-to-cart/variation.php:28
 msgid "Sorry, this product is unavailable. Please choose a different combination."
 msgstr ""
 
@@ -21204,7 +21204,7 @@ msgid "Store Notice"
 msgstr ""
 
 #: includes/customizer/class-wc-shop-customizer.php:337
-#: includes/wc-template-functions.php:960
+#: includes/wc-template-functions.php:1071
 msgid ""
 "This is a demo store for testing purposes &mdash; no orders shall be "
 "fulfilled."
@@ -21362,7 +21362,7 @@ msgid "Images will display using the aspect ratio in which they were uploaded"
 msgstr ""
 
 #: includes/customizer/class-wc-shop-customizer.php:694
-#: includes/wc-template-functions.php:1967
+#: includes/wc-template-functions.php:2086
 msgid "Checkout"
 msgstr ""
 
@@ -21380,7 +21380,7 @@ msgid "Required"
 msgstr ""
 
 #: includes/customizer/class-wc-shop-customizer.php:749
-#: includes/wc-template-functions.php:736
+#: includes/wc-template-functions.php:847
 msgid "I have read and agree to the website [terms]"
 msgstr ""
 
@@ -22732,7 +22732,7 @@ msgid "No matching product exists to update."
 msgstr ""
 
 #: includes/legacy/abstract-wc-legacy-order.php:507
-#: includes/wc-template-functions.php:3060
+#: includes/wc-template-functions.php:3179
 #. translators: 1: current item count
 #. translators: %d: downloads count
 msgid "Download %d"
@@ -24010,90 +24010,90 @@ msgstr ""
 msgid "Checkout is not available whilst your cart is empty."
 msgstr ""
 
-#: includes/wc-template-functions.php:842
+#: includes/wc-template-functions.php:953
 msgid "privacy policy"
 msgstr ""
 
-#: includes/wc-template-functions.php:843
+#: includes/wc-template-functions.php:954
 msgid "terms and conditions"
 msgstr ""
 
-#: includes/wc-template-functions.php:983
+#: includes/wc-template-functions.php:1094
 #. translators: %s: search query
 msgid "Search results: &ldquo;%s&rdquo;"
 msgstr ""
 
-#: includes/wc-template-functions.php:987
+#: includes/wc-template-functions.php:1098
 #. translators: %s: page number
 msgid "&nbsp;&ndash; Page %s"
 msgstr ""
 
-#: includes/wc-template-functions.php:1292
+#: includes/wc-template-functions.php:1411
 msgid "Default sorting"
 msgstr ""
 
-#: includes/wc-template-functions.php:1293
+#: includes/wc-template-functions.php:1412
 msgid "Sort by popularity"
 msgstr ""
 
-#: includes/wc-template-functions.php:1294
+#: includes/wc-template-functions.php:1413
 msgid "Sort by average rating"
 msgstr ""
 
-#: includes/wc-template-functions.php:1295
+#: includes/wc-template-functions.php:1414
 msgid "Sort by newness"
 msgstr ""
 
-#: includes/wc-template-functions.php:1296
+#: includes/wc-template-functions.php:1415
 msgid "Sort by price: low to high"
 msgstr ""
 
-#: includes/wc-template-functions.php:1297
+#: includes/wc-template-functions.php:1416
 msgid "Sort by price: high to low"
 msgstr ""
 
-#: includes/wc-template-functions.php:1304
+#: includes/wc-template-functions.php:1423
 msgid "Relevance"
 msgstr ""
 
-#: includes/wc-template-functions.php:1654
+#: includes/wc-template-functions.php:1773
 #: templates/checkout/form-shipping.php:63
 #: templates/single-product/tabs/additional-information.php:25
 msgid "Additional information"
 msgstr ""
 
-#: includes/wc-template-functions.php:1664
+#: includes/wc-template-functions.php:1783
 #. translators: %s: reviews count
 msgid "Reviews (%d)"
 msgstr ""
 
-#: includes/wc-template-functions.php:2093
+#: includes/wc-template-functions.php:2212
 msgid "Place order"
 msgstr ""
 
-#: includes/wc-template-functions.php:2532
+#: includes/wc-template-functions.php:2651
 msgid "Update country"
 msgstr ""
 
-#: includes/wc-template-functions.php:2551
+#: includes/wc-template-functions.php:2670
 #: templates/cart/shipping-calculator.php:61
 msgid "Select a state&hellip;"
 msgstr ""
 
-#: includes/wc-template-functions.php:2599
-#: includes/wc-template-functions.php:2761
-#: includes/wc-template-functions.php:2771
+#: includes/wc-template-functions.php:2718
+#: includes/wc-template-functions.php:2880
+#: includes/wc-template-functions.php:2890
 msgid "Choose an option"
 msgstr ""
 
-#: includes/wc-template-functions.php:3170
+#: includes/wc-template-functions.php:3289
 #. translators: 1: rating 2: rating count
 msgid "Rated %1$s out of 5 based on %2$s customer rating"
 msgid_plural "Rated %1$s out of 5 based on %2$s customer ratings"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/wc-template-functions.php:3217
+#: includes/wc-template-functions.php:3336
 msgid "Your cart is currently empty."
 msgstr ""
 
@@ -24444,11 +24444,11 @@ msgstr ""
 msgid "Remove this item"
 msgstr ""
 
-#: templates/cart/cart.php:136
+#: templates/cart/cart.php:140
 msgid "Coupon:"
 msgstr ""
 
-#: templates/cart/cart.php:141
+#: templates/cart/cart.php:148
 msgid "Update cart"
 msgstr ""
 
@@ -24494,19 +24494,19 @@ msgstr ""
 msgid "You must be logged in to checkout."
 msgstr ""
 
-#: templates/checkout/form-checkout.php:55
+#: templates/checkout/form-checkout.php:63
 msgid "Your order"
 msgstr ""
 
-#: templates/checkout/form-coupon.php:26
+#: templates/checkout/form-coupon.php:27
 msgid "Have a coupon?"
 msgstr ""
 
-#: templates/checkout/form-coupon.php:26
+#: templates/checkout/form-coupon.php:27
 msgid "Click here to enter your code"
 msgstr ""
 
-#: templates/checkout/form-coupon.php:31
+#: templates/checkout/form-coupon.php:32
 msgid "If you have a coupon code, please apply it below."
 msgstr ""
 
@@ -24725,16 +24725,16 @@ msgstr ""
 msgid "View order: %s"
 msgstr ""
 
-#: templates/global/form-login.php:35
+#: templates/global/form-login.php:37
 #: templates/myaccount/form-lost-password.php:27
 msgid "Username or email"
 msgstr ""
 
-#: templates/global/form-login.php:51 templates/myaccount/form-login.php:57
+#: templates/global/form-login.php:53 templates/myaccount/form-login.php:57
 msgid "Remember me"
 msgstr ""
 
-#: templates/global/form-login.php:55 templates/myaccount/form-login.php:61
+#: templates/global/form-login.php:57 templates/myaccount/form-login.php:61
 msgid "Lost your password?"
 msgstr ""
 
@@ -24771,11 +24771,12 @@ msgid ""
 "details</a>."
 msgstr ""
 
-#: templates/myaccount/downloads.php:41 templates/myaccount/orders.php:101
+#: templates/myaccount/downloads.php:41 templates/myaccount/downloads.php:47
+#: templates/myaccount/orders.php:101 templates/myaccount/orders.php:107
 msgid "Go shop"
 msgstr ""
 
-#: templates/myaccount/downloads.php:43
+#: templates/myaccount/downloads.php:43 templates/myaccount/downloads.php:49
 msgid "No downloads available yet."
 msgstr ""
 
@@ -24881,7 +24882,7 @@ msgstr[1] ""
 msgid "Previous"
 msgstr ""
 
-#: templates/myaccount/orders.php:103
+#: templates/myaccount/orders.php:103 templates/myaccount/orders.php:109
 msgid "No order has been made yet."
 msgstr ""
 
@@ -24891,6 +24892,7 @@ msgid "%1$s ending in %2$s"
 msgstr ""
 
 #: templates/myaccount/payment-methods.php:73
+#: templates/myaccount/payment-methods.php:74
 msgid "No saved methods found."
 msgstr ""
 
@@ -25000,10 +25002,6 @@ msgid "%s customer review"
 msgid_plural "%s customer reviews"
 msgstr[0] ""
 msgstr[1] ""
-
-#: templates/single-product/related.php:27
-msgid "Related products"
-msgstr ""
 
 #: templates/single-product/review-meta.php:27
 msgid "Your review is awaiting approval"
@@ -25542,12 +25540,12 @@ msgctxt "Price range: from-to"
 msgid "%1$s &ndash; %2$s"
 msgstr ""
 
-#: includes/wc-template-functions.php:2041
+#: includes/wc-template-functions.php:2160
 msgctxt "breadcrumb"
 msgid "Home"
 msgstr ""
 
-#: includes/wc-template-functions.php:3188
+#: includes/wc-template-functions.php:3307
 msgctxt "min_price"
 msgid "From:"
 msgstr ""

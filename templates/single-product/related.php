@@ -24,7 +24,7 @@ if ( $related_products ) : ?>
 
 	<section class="related products">
 
-		<h2 class="title is-2">Related Paintings</h2>
+		<h3 class="title is-3">Related Paintings</h3>
 
 		<?php woocommerce_product_loop_start(); ?>
 
