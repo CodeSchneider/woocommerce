@@ -220,19 +220,25 @@ class WC_Widget_Product_Categories extends WC_Widget {
 		$this->widget_start( $args, $instance );
 
 		if ( $dropdown ) {
-			wc_product_dropdown_categories(
-				apply_filters(
-					'woocommerce_product_categories_widget_dropdown_args', wp_parse_args(
-						$dropdown_args, array(
-							'show_count'         => $count,
-							'hierarchical'       => $hierarchical,
-							'show_uncategorized' => 0,
-							'orderby'            => $orderby,
-							'selected'           => $this->current_cat ? $this->current_cat->slug : '',
+			?>
+				<div class="select">
+				<?php
+				wc_product_dropdown_categories(
+					apply_filters(
+						'woocommerce_product_categories_widget_dropdown_args', wp_parse_args(
+							$dropdown_args, array(
+								'show_count'         => $count,
+								'hierarchical'       => $hierarchical,
+								'show_uncategorized' => 0,
+								'orderby'            => $orderby,
+								'selected'           => $this->current_cat ? $this->current_cat->slug : ''
+							)
 						)
 					)
-				)
-			);
+				);
+				?>
+				</div>
+			<?php
 			wc_enqueue_js(
 				"
 				jQuery( '.dropdown_product_cat' ).change( function() {

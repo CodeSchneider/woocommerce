@@ -22,6 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 <form class="woocommerce-ordering" method="get">
+	<label class="label is-small">Additonal filters</label>
 	<div class="select">
 		<select name="orderby" class="orderby">
 			<?php foreach ( $catalog_orderby_options as $id => $name ) : ?>

@@ -196,7 +196,7 @@ function wc_product_dropdown_categories( $args = array() ) {
 			'value_field'        => 'slug',
 			'taxonomy'           => 'product_cat',
 			'name'               => 'product_cat',
-			'class'              => 'dropdown_product_cat',
+			'class'              => 'dropdown_product_cat'
 		)
 	);
 
