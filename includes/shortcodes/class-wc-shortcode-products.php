@@ -176,9 +176,14 @@ class WC_Shortcode_Products {
 			'post_status'         => 'publish',
 			'ignore_sticky_posts' => true,
 			'no_found_rows'       => false === wc_string_to_bool( $this->attributes['paginate'] ),
-			'orderby'             => $this->attributes['orderby'],
-			'order'               => strtoupper( $this->attributes['order'] ),
+			'orderby'             => empty( $_GET['orderby'] ) ? $this->attributes['orderby'] : wc_clean( wp_unslash( $_GET['orderby'] ) ),
 		);
+
+		$orderby_value         = explode( '-', $query_args['orderby'] );
+		$orderby               = esc_attr( $orderby_value[0] );
+		$order                 = ! empty( $orderby_value[1] ) ? $orderby_value[1] : strtoupper( $this->attributes['order'] );
+		$query_args['orderby'] = $orderby;
+		$query_args['order']   = $order;
 
 		if ( wc_string_to_bool( $this->attributes['paginate'] ) ) {
 			$this->attributes['page'] = absint( empty( $_GET['product-page'] ) ? 1 : $_GET['product-page'] ); // WPCS: input var ok, CSRF ok.
@@ -323,10 +328,16 @@ class WC_Shortcode_Products {
 			}
 
 			$query_args['tax_query'][] = array(
-				'taxonomy' => 'product_cat',
-				'terms'    => $categories,
-				'field'    => $field,
-				'operator' => $this->attributes['cat_operator'],
+				'taxonomy'         => 'product_cat',
+				'terms'            => $categories,
+				'field'            => $field,
+				'operator'         => $this->attributes['cat_operator'],
+
+				/*
+				 * When cat_operator is AND, the children categories should be excluded,
+				 * as only products belonging to all the children categories would be selected.
+				 */
+				'include_children' => 'AND' === $this->attributes['cat_operator'] ? false : true,
 			);
 		}
 	}
@@ -574,9 +585,10 @@ class WC_Shortcode_Products {
 		ob_start();
 
 		if ( $products && $products->ids ) {
-			// Prime meta cache to reduce future queries.
-			update_meta_cache( 'post', $products->ids );
-			update_object_term_cache( $products->ids, 'product' );
+			// Prime caches to reduce future queries.
+			if ( is_callable( '_prime_post_caches' ) ) {
+				_prime_post_caches( $products->ids );
+			}
 
 			// Setup the loop.
 			wc_setup_loop(

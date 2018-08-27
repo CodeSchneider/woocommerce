@@ -236,8 +236,13 @@ class WC_REST_Products_Controller extends WC_REST_Legacy_Products_Controller {
 			}
 		}
 
+		// Build tax_query if taxonomies are set.
 		if ( ! empty( $tax_query ) ) {
-			$args['tax_query'] = $tax_query; // WPCS: slow query ok.
+			if ( ! empty( $args['tax_query'] ) ) {
+				$args['tax_query'] = array_merge( $tax_query, $args['tax_query'] ); // WPCS: slow query ok.
+			} else {
+				$args['tax_query'] = $tax_query; // WPCS: slow query ok.
+			}
 		}
 
 		// Filter featured.
@@ -877,7 +882,7 @@ class WC_REST_Products_Controller extends WC_REST_Legacy_Products_Controller {
 			}
 		}
 
-		// Product parent ID for groups.
+		// Product parent ID.
 		if ( isset( $request['parent_id'] ) ) {
 			$product->set_parent_id( $request['parent_id'] );
 		}
@@ -1064,9 +1069,9 @@ class WC_REST_Products_Controller extends WC_REST_Legacy_Products_Controller {
 		$images = is_array( $images ) ? array_filter( $images ) : array();
 
 		if ( ! empty( $images ) ) {
-			$gallery = array();
+			$gallery_positions = array();
 
-			foreach ( $images as $image ) {
+			foreach ( $images as $index => $image ) {
 				$attachment_id = isset( $image['id'] ) ? absint( $image['id'] ) : 0;
 
 				if ( 0 === $attachment_id && isset( $image['src'] ) ) {
@@ -1088,11 +1093,7 @@ class WC_REST_Products_Controller extends WC_REST_Legacy_Products_Controller {
 					throw new WC_REST_Exception( 'woocommerce_product_invalid_image_id', sprintf( __( '#%s is an invalid image ID.', 'woocommerce' ), $attachment_id ), 400 );
 				}
 
-				if ( isset( $image['position'] ) && 0 === absint( $image['position'] ) ) {
-					$product->set_image_id( $attachment_id );
-				} else {
-					$gallery[] = $attachment_id;
-				}
+				$gallery_positions[ $attachment_id ] = absint( isset( $image['position'] ) ? $image['position'] : $index );
 
 				// Set the image alt if present.
 				if ( ! empty( $image['alt'] ) ) {
@@ -1115,6 +1116,17 @@ class WC_REST_Products_Controller extends WC_REST_Legacy_Products_Controller {
 				}
 			}
 
+			// Sort images and get IDs in correct order.
+			asort( $gallery_positions );
+
+			// Get gallery in correct order.
+			$gallery = array_keys( $gallery_positions );
+
+			// Featured image is in position 0.
+			$image_id = array_shift( $gallery );
+
+			// Set images.
+			$product->set_image_id( $image_id );
 			$product->set_gallery_image_ids( $gallery );
 		} else {
 			$product->set_image_id( '' );
@@ -1347,13 +1359,18 @@ class WC_REST_Products_Controller extends WC_REST_Legacy_Products_Controller {
 			if ( $object->is_type( 'variable' ) ) {
 				foreach ( $object->get_children() as $child_id ) {
 					$child = wc_get_product( $child_id );
-					$child->delete( true );
+					if ( ! empty( $child ) ) {
+						$child->delete( true );
+					}
 				}
-			} elseif ( $object->is_type( 'grouped' ) ) {
+			} else {
+				// For other product types, if the product has children, remove the relationship.
 				foreach ( $object->get_children() as $child_id ) {
 					$child = wc_get_product( $child_id );
-					$child->set_parent_id( 0 );
-					$child->save();
+					if ( ! empty( $child ) ) {
+						$child->set_parent_id( 0 );
+						$child->save();
+					}
 				}
 			}
 
@@ -2093,7 +2110,7 @@ class WC_REST_Products_Controller extends WC_REST_Legacy_Products_Controller {
 			'validate_callback' => 'rest_validate_request_arg',
 		);
 		$params['attribute']      = array(
-			'description'       => __( 'Limit result set to products with a specific attribute.', 'woocommerce' ),
+			'description'       => __( 'Limit result set to products with a specific attribute. Use the taxonomy name/attribute slug.', 'woocommerce' ),
 			'type'              => 'string',
 			'sanitize_callback' => 'sanitize_text_field',
 			'validate_callback' => 'rest_validate_request_arg',

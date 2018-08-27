@@ -279,7 +279,7 @@ class WC_Product_CSV_Importer_Controller {
 		);
 
 		// phpcs:disable WordPress.CSRF.NonceVerification.NoNonceVerification -- Nonce already verified in WC_Product_CSV_Importer_Controller::upload_form_handler()
-		$file_url = isset( $_POST['file_url'] ) ? esc_url_raw( wp_unslash( $_POST['file_url'] ) ) : '';
+		$file_url = isset( $_POST['file_url'] ) ? wc_clean( wp_unslash( $_POST['file_url'] ) ) : '';
 
 		if ( empty( $file_url ) ) {
 			if ( ! isset( $_FILES['import'] ) ) {
@@ -295,7 +295,7 @@ class WC_Product_CSV_Importer_Controller {
 				'test_form' => false,
 				'mimes'     => $valid_filetypes,
 			);
-			$import    = wp_unslash( $_FILES['import'] ); // WPCS: sanitization ok.
+			$import    = $_FILES['import']; // WPCS: sanitization ok, input var ok.
 			$upload    = wp_handle_upload( $import, $overrides );
 
 			if ( isset( $upload['error'] ) ) {
@@ -475,6 +475,7 @@ class WC_Product_CSV_Importer_Controller {
 					__( 'In stock?', 'woocommerce' )      => 'stock_status',
 					__( 'Stock', 'woocommerce' )          => 'stock_quantity',
 					__( 'Backorders allowed?', 'woocommerce' ) => 'backorders',
+					__( 'Low stock amount', 'woocommerce' ) => 'low_stock_amount',
 					__( 'Sold individually?', 'woocommerce' ) => 'sold_individually',
 					/* translators: %s: Weight unit */
 					sprintf( __( 'Weight (%s)', 'woocommerce' ), $weight_unit ) => 'weight',
@@ -575,7 +576,7 @@ class WC_Product_CSV_Importer_Controller {
 	 * @return string
 	 */
 	protected function sanitize_special_column_name_regex( $value ) {
-		return '/' . str_replace( array( '%d', '%s' ), '(.*)', quotemeta( $value ) ) . '/';
+		return '/' . str_replace( array( '%d', '%s' ), '(.*)', trim( quotemeta( $value ) ) ) . '/';
 	}
 
 	/**
@@ -640,6 +641,7 @@ class WC_Product_CSV_Importer_Controller {
 			'stock_status'       => __( 'In stock?', 'woocommerce' ),
 			'stock_quantity'     => _x( 'Stock', 'Quantity in stock', 'woocommerce' ),
 			'backorders'         => __( 'Backorders allowed?', 'woocommerce' ),
+			'low_stock_amount'   => __( 'Low stock amount', 'woocommerce' ),
 			'sold_individually'  => __( 'Sold individually?', 'woocommerce' ),
 			/* translators: %s: weight unit */
 			'weight'             => sprintf( __( 'Weight (%s)', 'woocommerce' ), $weight_unit ),

@@ -101,7 +101,21 @@ class WC_Install {
 		),
 		'3.4.0' => array(
 			'wc_update_340_states',
+			'wc_update_340_state',
+			'wc_update_340_last_active',
 			'wc_update_340_db_version',
+		),
+		'3.4.3' => array(
+			'wc_update_343_cleanup_foreign_keys',
+			'wc_update_343_db_version',
+		),
+		'3.4.4' => array(
+			'wc_update_344_recreate_roles',
+			'wc_update_344_db_version',
+		),
+		'3.5.0' => array(
+			'wc_update_350_order_customer_id',
+			'wc_update_350_db_version',
 		),
 	);
 
@@ -153,12 +167,19 @@ class WC_Install {
 	 * This function is hooked into admin_init to affect admin only.
 	 */
 	public static function install_actions() {
-		if ( ! empty( $_GET['do_update_woocommerce'] ) ) { // WPCS: input var ok, CSRF ok.
+		if ( ! empty( $_GET['do_update_woocommerce'] ) ) { // WPCS: input var ok.
+			check_admin_referer( 'wc_db_update', 'wc_db_update_nonce' );
 			self::update();
 			WC_Admin_Notices::add_notice( 'update' );
 		}
-		if ( ! empty( $_GET['force_update_woocommerce'] ) ) { // WPCS: input var ok, CSRF ok.
-			do_action( 'wp_' . get_current_blog_id() . '_wc_updater_cron' );
+		if ( ! empty( $_GET['force_update_woocommerce'] ) ) { // WPCS: input var ok.
+			check_admin_referer( 'wc_force_db_update', 'wc_force_db_update_nonce' );
+			$blog_id = get_current_blog_id();
+
+			// Used to fire an action added in WP_Background_Process::_construct() that calls WP_Background_Process::handle_cron_healthcheck().
+			// This method will make sure the database updates are executed even if cron is disabled. Nothing will happen if the updates are already running.
+			do_action( 'wp_' . $blog_id . '_wc_updater_cron' );
+
 			wp_safe_redirect( admin_url( 'admin.php?page=wc-settings' ) );
 			exit;
 		}
@@ -351,7 +372,8 @@ class WC_Install {
 		wp_clear_scheduled_hook( 'woocommerce_scheduled_sales' );
 		wp_clear_scheduled_hook( 'woocommerce_cancel_unpaid_orders' );
 		wp_clear_scheduled_hook( 'woocommerce_cleanup_sessions' );
-		wp_clear_scheduled_hook( 'woocommerce_cleanup_orders' );
+		wp_clear_scheduled_hook( 'woocommerce_cleanup_personal_data' );
+		wp_clear_scheduled_hook( 'woocommerce_cleanup_logs' );
 		wp_clear_scheduled_hook( 'woocommerce_geoip_updater' );
 		wp_clear_scheduled_hook( 'woocommerce_tracker_send_event' );
 
@@ -365,8 +387,9 @@ class WC_Install {
 			wp_schedule_single_event( time() + ( absint( $held_duration ) * 60 ), 'woocommerce_cancel_unpaid_orders' );
 		}
 
-		wp_schedule_event( time(), 'daily', 'woocommerce_cleanup_orders' );
-		wp_schedule_event( time(), 'twicedaily', 'woocommerce_cleanup_sessions' );
+		wp_schedule_event( time(), 'daily', 'woocommerce_cleanup_personal_data' );
+		wp_schedule_event( time() + ( 3 * HOUR_IN_SECONDS ), 'daily', 'woocommerce_cleanup_logs' );
+		wp_schedule_event( time() + ( 6 * HOUR_IN_SECONDS ), 'twicedaily', 'woocommerce_cleanup_sessions' );
 		wp_schedule_event( strtotime( 'first tuesday of next month' ), 'monthly', 'woocommerce_geoip_updater' );
 		wp_schedule_event( time() + 10, apply_filters( 'woocommerce_tracker_event_recurrence', 'daily' ), 'woocommerce_tracker_send_event' );
 
@@ -436,6 +459,12 @@ class WC_Install {
 				}
 			}
 		}
+
+		// Define other defaults if not in setting screens.
+		add_option( 'woocommerce_single_image_width', '600', '', 'yes' );
+		add_option( 'woocommerce_thumbnail_image_width', '300', '', 'yes' );
+		add_option( 'woocommerce_checkout_highlight_required_fields', 'yes', '', 'yes' );
+		add_option( 'woocommerce_demo_store', 'no', '', 'no' );
 	}
 
 	/**
@@ -533,8 +562,38 @@ class WC_Install {
 			$wpdb->query( "ALTER TABLE {$wpdb->comments} ADD INDEX woo_idx_comment_type (comment_type)" );
 		}
 
-		// Add constraint to download logs.
-		$wpdb->query( "ALTER TABLE {$wpdb->prefix}wc_download_log ADD FOREIGN KEY (permission_id) REFERENCES {$wpdb->prefix}woocommerce_downloadable_product_permissions(permission_id) ON DELETE CASCADE" );
+		// Get tables data types and check it matches before adding constraint.
+		$download_log_columns     = $wpdb->get_results( "SHOW COLUMNS FROM {$wpdb->prefix}wc_download_log WHERE Field = 'permission_id'", ARRAY_A );
+		$download_log_column_type = '';
+		if ( isset( $download_log_columns[0]['Type'] ) ) {
+			$download_log_column_type = $download_log_columns[0]['Type'];
+		}
+
+		$download_permissions_columns     = $wpdb->get_results( "SHOW COLUMNS FROM {$wpdb->prefix}woocommerce_downloadable_product_permissions WHERE Field = 'permission_id'", ARRAY_A );
+		$download_permissions_column_type = '';
+		if ( isset( $download_permissions_columns[0]['Type'] ) ) {
+			$download_permissions_column_type = $download_permissions_columns[0]['Type'];
+		}
+
+		// Add constraint to download logs if the columns matches.
+		if ( ! empty( $download_permissions_column_type ) && ! empty( $download_log_column_type ) && $download_permissions_column_type === $download_log_column_type ) {
+			$fk_result = $wpdb->get_row( "
+				SELECT COUNT(*) AS fk_count
+				FROM information_schema.TABLE_CONSTRAINTS
+				WHERE CONSTRAINT_SCHEMA = '{$wpdb->dbname}'
+				AND CONSTRAINT_NAME = 'fk_wc_download_log_permission_id'
+				AND CONSTRAINT_TYPE = 'FOREIGN KEY'
+				AND TABLE_NAME = '{$wpdb->prefix}wc_download_log'
+			" );
+			if ( 0 === (int) $fk_result->fk_count ) {
+				$wpdb->query( "
+					ALTER TABLE `{$wpdb->prefix}wc_download_log`
+					ADD CONSTRAINT `fk_wc_download_log_permission_id`
+					FOREIGN KEY (`permission_id`)
+					REFERENCES `{$wpdb->prefix}woocommerce_downloadable_product_permissions` (`permission_id`) ON DELETE CASCADE;
+				" );
+			}
+		}
 	}
 
 	/**
@@ -841,10 +900,16 @@ CREATE TABLE {$wpdb->prefix}woocommerce_termmeta (
 			$wp_roles = new WP_Roles(); // @codingStandardsIgnoreLine
 		}
 
+		// Dummy gettext calls to get strings in the catalog.
+		/* translators: user role */
+		_x( 'Customer', 'User role', 'woocommerce' );
+		/* translators: user role */
+		_x( 'Shop manager', 'User role', 'woocommerce' );
+
 		// Customer role.
 		add_role(
 			'customer',
-			__( 'Customer', 'woocommerce' ),
+			'Customer',
 			array(
 				'read' => true,
 			)
@@ -853,7 +918,7 @@ CREATE TABLE {$wpdb->prefix}woocommerce_termmeta (
 		// Shop manager role.
 		add_role(
 			'shop_manager',
-			__( 'Shop manager', 'woocommerce' ),
+			'Shop manager',
 			array(
 				'level_9'                => true,
 				'level_8'                => true,
@@ -894,6 +959,7 @@ CREATE TABLE {$wpdb->prefix}woocommerce_termmeta (
 				'export'                 => true,
 				'import'                 => true,
 				'list_users'             => true,
+				'edit_theme_options'     => true,
 			)
 		);
 
@@ -1026,6 +1092,58 @@ CREATE TABLE {$wpdb->prefix}woocommerce_termmeta (
 				}
 			}
 		}
+
+		// Create attachment for placeholders.
+		self::create_placeholder_image();
+	}
+
+	/**
+	 * Create a placeholder image in the media library.
+	 *
+	 * @since 3.5.0
+	 */
+	private static function create_placeholder_image() {
+		$placeholder_image = get_option( 'woocommerce_placeholder_image', 0 );
+
+		if ( ! is_numeric( $placeholder_image ) ) {
+			return;
+		}
+
+		if ( ! empty( $placeholder_image ) && is_numeric( $placeholder_image ) && wp_attachment_is_image( $placeholder_image ) ) {
+			return;
+		}
+
+		$upload_dir = wp_upload_dir();
+		$source     = WC()->plugin_path() . '/assets/images/placeholder.png';
+		$filename   = $upload_dir['basedir'] . '/woocommerce-placeholder.png';
+
+		if ( ! file_exists( $filename ) ) {
+			copy( $source, $filename ); // @codingStandardsIgnoreLine.
+		}
+
+		if ( ! file_exists( $filename ) ) {
+			update_option( 'woocommerce_placeholder_image', 0 );
+			return;
+		}
+
+		$filetype   = wp_check_filetype( basename( $filename ), null );
+		$attachment = array(
+			'guid'           => $upload_dir['url'] . '/' . basename( $filename ),
+			'post_mime_type' => $filetype['type'],
+			'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $filename ) ),
+			'post_content'   => '',
+			'post_status'    => 'inherit',
+		);
+		$attach_id  = wp_insert_attachment( $attachment, $filename );
+
+		update_option( 'woocommerce_placeholder_image', $attach_id );
+
+		// Make sure that this file is included, as wp_generate_attachment_metadata() depends on it.
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+
+		// Generate the metadata for the attachment, and update the database record.
+		$attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
+		wp_update_attachment_metadata( $attach_id, $attach_data );
 	}
 
 	/**
@@ -1070,8 +1188,9 @@ CREATE TABLE {$wpdb->prefix}woocommerce_termmeta (
 	 * @param string $key Plugin relative path. Example: woocommerce/woocommerce.php.
 	 */
 	private static function associate_plugin_file( $plugins, $key ) {
-		$path                = explode( '/', $key );
-		$plugins[ $path[1] ] = $key;
+		$path                 = explode( '/', $key );
+		$filename             = end( $path );
+		$plugins[ $filename ] = $key;
 		return $plugins;
 	}
 
@@ -1197,6 +1316,7 @@ CREATE TABLE {$wpdb->prefix}woocommerce_termmeta (
 			// Activate this thing.
 			if ( $activate ) {
 				try {
+					add_action( 'add_option_mailchimp_woocommerce_plugin_do_activation_redirect', array( __CLASS__, 'remove_mailchimps_redirect' ), 10, 2 );
 					$result = activate_plugin( $installed ? $installed_plugins[ $plugin_file ] : $plugin_slug . '/' . $plugin_file );
 
 					if ( is_wp_error( $result ) ) {
@@ -1215,6 +1335,20 @@ CREATE TABLE {$wpdb->prefix}woocommerce_termmeta (
 				}
 			}
 		}
+	}
+
+	/**
+	 * Removes redirect added during MailChimp plugin's activation.
+	 *
+	 * @param string $option Option name.
+	 * @param string $value  Option value.
+	 */
+	public static function remove_mailchimps_redirect( $option, $value ) {
+		// Remove this action to prevent infinite looping.
+		remove_action( 'add_option_mailchimp_woocommerce_plugin_do_activation_redirect', array( __CLASS__, 'remove_mailchimps_redirect' ) );
+
+		// Update redirect back to false.
+		update_option( 'mailchimp_woocommerce_plugin_do_activation_redirect', false );
 	}
 
 	/**

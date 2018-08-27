@@ -167,7 +167,7 @@ class WC_Frontend_Scripts {
 			'flexslider'                 => array(
 				'src'     => self::get_asset_url( 'assets/js/flexslider/jquery.flexslider' . $suffix . '.js' ),
 				'deps'    => array( 'jquery' ),
-				'version' => '2.7.0',
+				'version' => '2.7.1',
 			),
 			'js-cookie'                  => array(
 				'src'     => self::get_asset_url( 'assets/js/js-cookie/js.cookie' . $suffix . '.js' ),
@@ -256,12 +256,12 @@ class WC_Frontend_Scripts {
 			),
 			'wc-add-to-cart'             => array(
 				'src'     => self::get_asset_url( 'assets/js/frontend/add-to-cart' . $suffix . '.js' ),
-				'deps'    => array( 'jquery' ),
+				'deps'    => array( 'jquery', 'jquery-blockui' ),
 				'version' => WC_VERSION,
 			),
 			'wc-add-to-cart-variation'   => array(
 				'src'     => self::get_asset_url( 'assets/js/frontend/add-to-cart-variation' . $suffix . '.js' ),
-				'deps'    => array( 'jquery', 'wp-util' ),
+				'deps'    => array( 'jquery', 'wp-util', 'jquery-blockui' ),
 				'version' => WC_VERSION,
 			),
 			'wc-geolocation'             => array(
@@ -292,7 +292,7 @@ class WC_Frontend_Scripts {
 			'zoom'                       => array(
 				'src'     => self::get_asset_url( 'assets/js/zoom/jquery.zoom' . $suffix . '.js' ),
 				'deps'    => array( 'jquery' ),
-				'version' => '1.7.15',
+				'version' => '1.7.21',
 			),
 		);
 		foreach ( $register_scripts as $name => $props ) {
@@ -390,7 +390,7 @@ class WC_Frontend_Scripts {
 		}
 
 		if ( 'geolocation_ajax' === get_option( 'woocommerce_default_customer_address' ) ) {
-			$ua = wc_get_user_agent(); // Exclude common bots from geolocation by user agent.
+			$ua = strtolower( wc_get_user_agent() ); // Exclude common bots from geolocation by user agent.
 
 			if ( ! strstr( $ua, 'bot' ) && ! strstr( $ua, 'spider' ) && ! strstr( $ua, 'crawl' ) ) {
 				self::enqueue_script( 'wc-geolocation' );

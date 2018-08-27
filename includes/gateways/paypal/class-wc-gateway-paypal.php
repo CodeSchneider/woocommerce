@@ -60,8 +60,7 @@ class WC_Gateway_Paypal extends WC_Payment_Gateway {
 		$this->email          = $this->get_option( 'email' );
 		$this->receiver_email = $this->get_option( 'receiver_email', $this->email );
 		$this->identity_token = $this->get_option( 'identity_token' );
-
-		self::$log_enabled = $this->debug;
+		self::$log_enabled    = $this->debug;
 
 		if ( $this->testmode ) {
 			/* translators: %s: Link to PayPal sandbox testing guide page */
@@ -117,19 +116,44 @@ class WC_Gateway_Paypal extends WC_Payment_Gateway {
 	}
 
 	/**
+	 * Processes and saves options.
+	 * If there is an error thrown, will continue to save and validate fields, but will leave the erroring field out.
+	 *
+	 * @return bool was anything saved?
+	 */
+	public function process_admin_options() {
+		$saved = parent::process_admin_options();
+
+		// Maybe clear logs.
+		if ( 'yes' !== $this->get_option( 'debug', 'no' ) ) {
+			if ( empty( self::$log ) ) {
+				self::$log = wc_get_logger();
+			}
+			self::$log->clear( 'paypal' );
+		}
+
+		return $saved;
+	}
+
+	/**
 	 * Get gateway icon.
 	 *
 	 * @return string
 	 */
 	public function get_icon() {
+		// We need a base country for the link to work, bail if in the unlikely event no country is set.
+		$base_country = WC()->countries->get_base_country();
+		if ( empty( $base_country ) ) {
+			return '';
+		}
 		$icon_html = '';
-		$icon      = (array) $this->get_icon_image( WC()->countries->get_base_country() );
+		$icon      = (array) $this->get_icon_image( $base_country );
 
 		foreach ( $icon as $i ) {
 			$icon_html .= '<img src="' . esc_attr( $i ) . '" alt="' . esc_attr__( 'PayPal acceptance mark', 'woocommerce' ) . '" />';
 		}
 
-		$icon_html .= sprintf( '<a href="%1$s" class="about_paypal" onclick="javascript:window.open(\'%1$s\',\'WIPaypal\',\'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=1060, height=700\'); return false;">' . esc_attr__( 'What is PayPal?', 'woocommerce' ) . '</a>', esc_url( $this->get_icon_url( WC()->countries->get_base_country() ) ) );
+		$icon_html .= sprintf( '<a href="%1$s" class="about_paypal" onclick="javascript:window.open(\'%1$s\',\'WIPaypal\',\'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=1060, height=700\'); return false;">' . esc_attr__( 'What is PayPal?', 'woocommerce' ) . '</a>', esc_url( $this->get_icon_url( $base_country ) ) );
 
 		return apply_filters( 'woocommerce_gateway_icon', $icon_html, $this->id );
 	}

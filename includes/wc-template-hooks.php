@@ -18,8 +18,8 @@ add_filter( 'post_class', 'wc_product_post_class', 20, 3 );
  *
  * @see wc_generator_tag()
  */
-add_action( 'get_the_generator_html', 'wc_generator_tag', 10, 2 );
-add_action( 'get_the_generator_xhtml', 'wc_generator_tag', 10, 2 );
+add_filter( 'get_the_generator_html', 'wc_generator_tag', 10, 2 );
+add_filter( 'get_the_generator_xhtml', 'wc_generator_tag', 10, 2 );
 
 /**
  * Content Wrappers.
@@ -289,3 +289,14 @@ add_action( 'woocommerce_account_payment-methods_endpoint', 'woocommerce_account
 add_action( 'woocommerce_account_add-payment-method_endpoint', 'woocommerce_account_add_payment_method' );
 add_action( 'woocommerce_account_edit-account_endpoint', 'woocommerce_account_edit_account' );
 add_action( 'woocommerce_register_form', 'wc_registration_privacy_policy_text', 20 );
+
+/**
+ * Notices.
+ */
+add_action( 'woocommerce_cart_is_empty', 'woocommerce_output_all_notices', 10 );
+add_action( 'woocommerce_shortcode_before_product_cat_loop', 'woocommerce_output_all_notices', 10 );
+add_action( 'woocommerce_before_shop_loop', 'woocommerce_output_all_notices', 10 );
+add_action( 'woocommerce_before_single_product', 'woocommerce_output_all_notices', 10 );
+add_action( 'woocommerce_before_cart', 'woocommerce_output_all_notices', 10 );
+add_action( 'woocommerce_before_checkout_form', 'woocommerce_output_all_notices', 10 );
+add_action( 'woocommerce_account_content', 'woocommerce_output_all_notices', 10 );
