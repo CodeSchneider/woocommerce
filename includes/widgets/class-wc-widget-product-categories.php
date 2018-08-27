@@ -221,7 +221,7 @@ class WC_Widget_Product_Categories extends WC_Widget {
 
 		if ( $dropdown ) {
 			?>
-				<div class="select">
+				<div class="select testing">
 				<?php
 				wc_product_dropdown_categories(
 					apply_filters(
@@ -240,8 +240,9 @@ class WC_Widget_Product_Categories extends WC_Widget {
 				</div>
 			<?php
 
-			wp_enqueue_script( 'selectWoo' );
-			wp_enqueue_style( 'select2' );
+			// wp_enqueue_script( 'selectWoo' );
+			// wp_enqueue_style( 'select2' );
+			
 			wc_enqueue_js(
 				"
 				jQuery( '.dropdown_product_cat' ).change( function() {
